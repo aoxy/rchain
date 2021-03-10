@@ -1,8 +1,8 @@
-package client
+package examples
 
 import (
 	"context"
-	casper_v1 "dawn1806/rchain/client/pb"
+	casper_v1 "dawn1806/rchain/api/pb"
 	"fmt"
 	"google.golang.org/grpc"
 	"io"

@@ -5,13 +5,13 @@ package casper_v1
 
 import (
 	context "context"
+	_ "dawn1806/rchain/api/pb/scalapb"
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
 	math "math"
-	_ "dawn1806/rchain/client/pb/scalapb"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.

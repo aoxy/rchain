@@ -1,7 +1,9 @@
 package main
 
-import "dawn1806/rchain/client"
+import (
+	"dawn1806/rchain/examples"
+)
 
 func main() {
-	client.Run()
+	examples.Run()
 }
