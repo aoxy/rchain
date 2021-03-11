@@ -1,4 +1,4 @@
-package examples
+package test
 
 import (
 	"context"
@@ -7,13 +7,16 @@ import (
 	"google.golang.org/grpc"
 	"io"
 	"log"
+	"testing"
 )
 
-func Run() {
+func TestGetBlockInfo(t *testing.T) {
 
-	const target = "observer-asia.services.mainnet.rchain.coop:40401"
+	const target1 = "observer-asia.services.mainnet.rchain.coop:40401"
+	const target2 = "observer-eu.services.mainnet.rchain.coop:40401"
+	const target3 = "observer-us.services.mainnet.rchain.coop:40401"
 
-	conn, err := grpc.Dial(target, grpc.WithInsecure())
+	conn, err := grpc.Dial(target1, grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("grpc Dial error ", err)
 	}
@@ -39,33 +42,3 @@ func Run() {
 		fmt.Printf("blockHash=%s \t blockNumber=%d \n", lightBlockInfo.BlockHash, lightBlockInfo.BlockNumber)
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,9 +1,8 @@
 package main
 
-import (
-	"dawn1806/rchain/examples"
-)
+import "dawn1806/rchain/internal/service"
 
 func main() {
-	examples.Run()
+	service.InitConfig()
+	service.Run()
 }
