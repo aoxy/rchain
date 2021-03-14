@@ -5,9 +5,7 @@ import (
 	"dawn1806/rchain/internal/utils"
 	"fmt"
 	"reflect"
-	"strconv"
 	"strings"
-	"sync"
 	"testing"
 	"time"
 )
@@ -116,38 +114,4 @@ func TestGetBlockInfos(t *testing.T) {
 	DSClient, _, _ := utils.NewDeployServiceClient(grpcUrl)
 	blockInfo, _ := utils.LastFinalizedBlock(DSClient)
 	fmt.Println(blockInfo)
-}
-
-func TestDeployService(t *testing.T) {
-
-	var transCh = make(chan string, 10)
-
-	var wg = sync.WaitGroup{}
-	wg.Add(2)
-
-	go func() {
-		for i := 0; i < 3; i++ {
-			s := "111" + strconv.Itoa(i)
-			fmt.Println(s)
-			transCh <- s
-		}
-		close(transCh)
-		wg.Done()
-	}()
-
-	go func() {
-		for {
-			s := <-transCh
-			if s == "" {
-				break
-			}
-			s = s + "222"
-			fmt.Println(s)
-			time.Sleep(time.Second)
-		}
-		wg.Done()
-	}()
-
-	wg.Wait()
-	fmt.Println("over.")
 }

@@ -42,7 +42,9 @@ func initConfig() {
 		BlockInfoCh:    make(chan *casperV1.LightBlockInfo, 1),
 	}
 
-	// 读取最新blockNumber文件，初始化LastBlockNo
+	// 读取最新blockNumber文件[文件来源：获取交易数据后会更新该文件内容]，初始化LastBlockNo
+	// 这个blockNumber是上一次以及处理的最后一个blockNumber
+	// 目的：当发生错误、重启等操作后，为了保证交易信息的连续性
 	data := utils.ReadFile(viper.GetString("global.output") + ".latest_blocknumber")
 	fmt.Println("data: ", data)
 	if data != nil {
@@ -65,14 +67,18 @@ func Run() {
 func HandleTransaction() {
 	wg := &sync.WaitGroup{}
 	wg.Add(2)
-	// 启动一个协程，获取最新的blockHash，放入管道
+	// 启动一个协程，获取最新的block信息，放入管道
 	go GetBlockInfo(wg)
-	// 从管道取出blockHash，调用http接口获得交易信息，将交易信息写入文件
+	// 从管道取出block信息，调用http接口获得交易信息，将交易信息写入文件
 	go GetTransferInfo(wg)
 	wg.Wait()
 	log.Println("处理交易信息结束")
 }
 
+// 功能：循环获取block信息，放入管道，供其他协程使用
+// todo：循环中断的错误处理、重新唤醒协程；
+// todo：考虑使用定时器
+// todo：考虑将block信息持久化
 func GetBlockInfo(wg *sync.WaitGroup) {
 	defer wg.Done()
 	defer t.Conn.Close()
@@ -92,7 +98,7 @@ func GetBlockInfo(wg *sync.WaitGroup) {
 		// 如果是第一次获取，则获取最新的10个区块
 		// t.LastBlockNo第一次获取初始化为0，当写文件成功后更新为最新已处理的blockNumber
 		if t.LastBlockNo == 0 {
-			t.LastBlockNo = blockInfo.BlockNumber - 30
+			t.LastBlockNo = blockInfo.BlockNumber - 10
 		}
 
 		// 判断blockNumber是否连续
@@ -114,8 +120,10 @@ func GetBlockInfo(wg *sync.WaitGroup) {
 
 		// 如果不连续，则先把漏掉的block取出进行处理
 		if blockInfo.BlockNumber > needBlockNumber {
-			// 根据blockNumber区间获取block信息
 			fmt.Println("开始调用接口：GetBlocksByHeightClient")
+			// 根据blockNumber区间获取block信息
+			// 经测试发现：区间超过100就会直接返回空，区间100以内，随着区间的大小，请求时间成正比
+			// todo：如何在保证连续性的情况下，设置合理的区间大小？
 			blockInfos, err := utils.GetBlocksByHeightClient(t.DSClient, needBlockNumber, blockInfo.BlockNumber)
 			if err != nil {
 				log.Println("502 获取block信息失败，", err)
@@ -140,10 +148,15 @@ func GetBlockInfo(wg *sync.WaitGroup) {
 	}
 }
 
+// 功能：获取交易信息，并写入指定文件
+// 循环从管道取出block信息，调用http接口可以得到交易信息
+// todo：错误中断循环后再次唤醒
+// todo: 经大量测试，只有少数几个block有交易数据，那么无交易数据的block该如何处理？丢弃还是其他？
 func GetTransferInfo(wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	fmt.Println("开始获取交易信息...")
+	// 输出文件目录
 	output := viper.GetString("global.output")
 	for {
 		blockInfo := <-t.BlockInfoCh
@@ -168,6 +181,7 @@ func GetTransferInfo(wg *sync.WaitGroup) {
 		}
 		fmt.Println("读取body成功")
 
+		// 将得到的交易信息，解析到结构体，方便程序做下一步处理
 		var transInfos = make([][]BlockTransferInfo, 0)
 		err = json.Unmarshal(body, &transInfos)
 		if err != nil {
@@ -191,7 +205,8 @@ func GetTransferInfo(wg *sync.WaitGroup) {
 			// 将无交易数据的blockHash持久化到文件
 			utils.WriteFile(output+"no_transaction_block",
 				blockInfo.BlockHash+"\t"+strconv.FormatInt(blockInfo.BlockNumber, 10)+"\n", false)
-			//每个一段时间（比如10分钟）重新获取交易数据
+			// todo：每个一段时间（比如10分钟）重新获取交易数据
+			// todo：经测试，就算间隔半天，这部分block也无交易数据，对这部分block如何处理？
 		}
 
 		// 更新t.LastBlockNo为最新的blockNumber
@@ -207,5 +222,5 @@ func init() {
 		fmt.Println("viper read file error ", err)
 		return
 	}
-	fmt.Fprintln(os.Stdout, "using config file:", viper.ConfigFileUsed())
+	fmt.Fprintln(os.Stderr, "using config file:", viper.ConfigFileUsed())
 }

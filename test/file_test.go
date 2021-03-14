@@ -7,8 +7,7 @@ import (
 	"testing"
 )
 
-func TestWriteFile(t *testing.T) {
-
+func TestOpFile(t *testing.T) {
 	file := "E:\\work\\rchain\\docs\\output\\.latest_blocknumber"
 	data := utils.ReadFile(file)
 	if data != nil {

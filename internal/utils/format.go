@@ -5,6 +5,7 @@ import (
 	"reflect"
 )
 
+// 递归解析结构体，输出切片数组，解决嵌套结构体解析问题
 func FormatStruct(v reflect.Value, s []string) []string {
 	t := v.Type()
 	for i := 0; i < v.NumField(); i++ {
