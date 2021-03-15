@@ -1,4 +1,4 @@
-package bitcoin
+package main
 
 import (
 	"bytes"
@@ -26,6 +26,7 @@ func NewProofOfWork(b *Block) *ProofOfWork {
 }
 
 func (p *ProofOfWork) Run() (int, []byte) {
+	// hashInt是hash的整形表示
 	var hashInt big.Int
 	var hash [32]byte
 	nonce := 0
@@ -38,13 +39,24 @@ func (p *ProofOfWork) Run() (int, []byte) {
 		hashInt.SetBytes(hash[:])
 
 		if hashInt.Cmp(p.target) == -1 {
-			fmt.Printf("\r%x", hash)
+			fmt.Printf("\r%x \n\n", hash)
 			break
 		} else {
 			nonce++
 		}
 	}
 	return nonce, hash[:]
+}
+
+// 对工作量证明进行验证
+func (p *ProofOfWork) Validate() bool {
+	var hashInt big.Int
+
+	data := p.prepareData(p.block.Nonce)
+	hash := sha256.Sum256(data)
+	hashInt.SetBytes(hash[:])
+
+	return hashInt.Cmp(p.target) == -1
 }
 
 func (p *ProofOfWork) prepareData(nonce int) []byte {
