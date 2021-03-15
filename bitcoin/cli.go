@@ -1,4 +1,4 @@
-package main
+package bitcoin
 
 import (
 	"flag"
@@ -8,7 +8,7 @@ import (
 )
 
 type CLI struct {
-	bc *Blockchain
+	Bc *Blockchain
 }
 
 func (cli *CLI) Run() {
@@ -41,12 +41,12 @@ func (cli *CLI) Run() {
 }
 
 func (cli *CLI) addBlock(data string) {
-	cli.bc.AddBlock(data)
+	cli.Bc.AddBlock(data)
 	fmt.Println("Success!")
 }
 
 func (cli *CLI) printChain() {
-	bci := cli.bc.Iterator()
+	bci := cli.Bc.Iterator()
 
 	for {
 		block := bci.Next()

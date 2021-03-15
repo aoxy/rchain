@@ -1,13 +1,14 @@
-package main
+package bitcoin
 
 import (
 	"fmt"
 	"github.com/boltdb/bolt"
+	"github.com/spf13/viper"
 )
 
 type Blockchain struct {
-	tip []byte
-	db  *bolt.DB
+	Tip []byte
+	Db  *bolt.DB
 }
 
 type BlockchainIterator struct {
@@ -32,7 +33,7 @@ func NewBlockchain() *Blockchain {
 	// 		存储到数据库；
 	// 		将创世块哈希保存为最后一个块的哈希；
 	// 		创建一个新的 Blockchain 实例，初始时 tip 指向创世块
-	db, err := bolt.Open("E:\\work\\rchain\\bitcoin\\db\\chain.db", 0600, nil)
+	db, err := bolt.Open(viper.GetString("bitcoin.dbFile"), 0600, nil)
 	if err != nil {
 		fmt.Println(err)
 		return nil
@@ -59,7 +60,7 @@ func (c *Blockchain) AddBlock(data string) {
 	var lastHash []byte
 
 	// BoltDB 事务类型（只读）
-	err := c.db.View(func(tx *bolt.Tx) error {
+	err := c.Db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(blocksBucket))
 		lastHash = b.Get([]byte("1"))
 		return nil
@@ -73,7 +74,7 @@ func (c *Blockchain) AddBlock(data string) {
 	newBlock := NewBlock(data, lastHash)
 
 	// BoltDB 事务类型（读写）
-	err = c.db.Update(func(tx *bolt.Tx) error {
+	err = c.Db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(blocksBucket))
 		err := b.Put(newBlock.Hash, newBlock.Serialize())
 		if err != nil {
@@ -83,7 +84,7 @@ func (c *Blockchain) AddBlock(data string) {
 		if err != nil {
 			return err
 		}
-		c.tip = newBlock.Hash
+		c.Tip = newBlock.Hash
 		return nil
 	})
 
@@ -94,7 +95,7 @@ func (c *Blockchain) AddBlock(data string) {
 
 // 迭代器的初始状态为链中的 tip，因此区块将从尾到头（创世块为头），也就是从最新的到最旧的进行获取。
 func (c *Blockchain) Iterator() *BlockchainIterator {
-	return &BlockchainIterator{c.tip, c.db}
+	return &BlockchainIterator{c.Tip, c.Db}
 }
 
 // BlockchainIterator 只会做一件事情：返回链中的下一个块。

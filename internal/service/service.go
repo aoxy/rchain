@@ -9,7 +9,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 	"strconv"
 	"sync"
 	"time"
@@ -214,13 +213,4 @@ func GetTransferInfo(wg *sync.WaitGroup) {
 		// 将blockInfo.BlockNumber更新到文件持久化，保证下次获取
 		utils.WriteFile(output+".latest_blocknumber", strconv.FormatInt(blockInfo.BlockNumber, 10), true)
 	}
-}
-
-func init() {
-	viper.SetConfigFile("./config/rchain-dev.toml")
-	if err := viper.ReadInConfig(); err != nil {
-		fmt.Println("viper read file error ", err)
-		return
-	}
-	fmt.Fprintln(os.Stderr, "using config file:", viper.ConfigFileUsed())
 }
