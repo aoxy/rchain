@@ -59,6 +59,15 @@ func LastFinalizedBlock(DSClient casperV1.DeployServiceClient) (*casperV1.LightB
 	return resp.GetBlockInfo().GetBlockInfo(), nil
 }
 
+func DoDeploy(DSClient casperV1.DeployServiceClient, deploy *casperV1.DeployDataProto) (*casperV1.DeployResponse, error) {
+	resp, err := DSClient.DoDeploy(context.Background(), deploy)
+	if err != nil {
+		log.Fatal("DoDeploy error ", err)
+		return nil, err
+	}
+	return resp, nil
+}
+
 func GetBlocks(DSClient casperV1.DeployServiceClient) {
 	// 获取最近的区块
 	//_, err := t.DSClient.GetBlocks(context.Background(), &casperV1.BlocksQuery{Depth: 20})

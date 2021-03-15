@@ -37,6 +37,10 @@ func ReadFile(file string) []byte {
 	return data[:n]
 }
 
+func ReadFileToString(file string) string {
+	return string(ReadFile(file))
+}
+
 func PathExists(path string) (bool, error) {
 	_, err := os.Stat(path)
 	if err == nil {
