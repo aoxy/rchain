@@ -12,6 +12,7 @@ type Block struct {
 	PrevBlockHash []byte
 	Hash          []byte
 	Nonce         int
+	Transactions  []Transaction
 }
 
 // 创世区块
