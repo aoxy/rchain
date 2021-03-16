@@ -11,9 +11,6 @@ func main() {
 
 	// service.Run()
 
-	bc := bitcoin.NewBlockchain()
-	defer bc.Db.Close()
-
-	cli := bitcoin.CLI{Bc: bc}
+	cli := bitcoin.CLI{}
 	cli.Run()
 }

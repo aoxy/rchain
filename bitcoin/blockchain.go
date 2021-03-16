@@ -19,7 +19,7 @@ type BlockchainIterator struct {
 
 var blocksBucket = "bc-bucket"
 
-func NewBlockchain() *Blockchain {
+func NewBlockchain(address string) *Blockchain {
 
 	// tip有尾部，尖端的意思，在这里tip存储的是最后一个块的哈希
 	var tip []byte
@@ -41,12 +41,30 @@ func NewBlockchain() *Blockchain {
 	}
 
 	err = db.Update(func(tx *bolt.Tx) error {
+		cbtx := NewCoinbaseTX(address, "New Block.")
+		genesis := NewGenesisBlock(cbtx)
 		b := tx.Bucket([]byte(blocksBucket))
+
 		if b == nil {
-			genesis := NewGenesisBlock()
+			fmt.Println("创建Bucket")
 			b, err = tx.CreateBucket([]byte(blocksBucket))
+			if err != nil {
+				fmt.Println("CreateBucket error ", err)
+				return err
+			}
+			fmt.Println("CreateBucket success")
 			err = b.Put(genesis.Hash, genesis.Serialize())
+			if err != nil {
+				fmt.Println("Put1 error ", err)
+				return err
+			}
+			fmt.Println("Put1 success")
 			err = b.Put([]byte("1"), genesis.Hash)
+			if err != nil {
+				fmt.Println("Put2 error ", err)
+				return err
+			}
+			fmt.Println("Put2 success")
 			tip = genesis.Hash
 		} else {
 			tip = b.Get([]byte("1"))
@@ -54,10 +72,11 @@ func NewBlockchain() *Blockchain {
 		return nil
 	})
 
+	fmt.Println("ok...", tip)
 	return &Blockchain{tip, db}
 }
 
-func (c *Blockchain) AddBlock(data string) {
+func (c *Blockchain) AddBlock(transactions []*Transaction) {
 	var lastHash []byte
 
 	// BoltDB 事务类型（只读）
@@ -72,7 +91,7 @@ func (c *Blockchain) AddBlock(data string) {
 		return
 	}
 
-	newBlock := NewBlock(data, lastHash)
+	newBlock := NewBlock(transactions, lastHash)
 
 	// BoltDB 事务类型（读写）
 	err = c.Db.Update(func(tx *bolt.Tx) error {
@@ -92,6 +111,30 @@ func (c *Blockchain) AddBlock(data string) {
 	if err != nil {
 		fmt.Println("AddBlock error ", err)
 	}
+}
+
+// 找到可以花费的交易
+func (c *Blockchain) FindSpendableOutputs(address string, amount int) (int, map[string][]int) {
+	unspentOutputs := make(map[string][]int)
+	unspentTXs := c.FindUnspentTransactions(address)
+	accumulated := 0
+
+Work:
+	for _, tx := range unspentTXs {
+		txID := hex.EncodeToString(tx.ID)
+		for outIdx, out := range tx.Vout {
+			if out.CanBeUnlockedWith(address) && accumulated < amount {
+				accumulated += out.Value
+				unspentOutputs[txID] = append(unspentOutputs[txID], outIdx)
+
+				if accumulated >= amount {
+					break Work
+				}
+			}
+		}
+	}
+
+	return accumulated, unspentOutputs
 }
 
 // 找到包含未花费输出的交易
@@ -117,11 +160,11 @@ func (c *Blockchain) FindUnspentTransactions(address string) []Transaction {
 				}
 
 				if out.CanBeUnlockedWith(address) {
-					unspentTXs = append(unspentTXs, tx)
+					unspentTXs = append(unspentTXs, *tx)
 				}
 			}
 
-			if tx.IscoinBase() == false {
+			if tx.IsCoinBase() == false {
 				for _, in := range tx.Vin {
 					if in.CanUnlockOutputWith(address) {
 						inTxID := hex.EncodeToString(in.Txid)

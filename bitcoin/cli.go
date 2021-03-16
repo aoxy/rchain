@@ -15,7 +15,9 @@ func (cli *CLI) Run() {
 	addBlockCmd := flag.NewFlagSet("addblock", flag.ExitOnError)
 	printChainCmd := flag.NewFlagSet("printchain", flag.ExitOnError)
 
-	addBlockData := addBlockCmd.String("data", "", "Block data")
+	from := addBlockCmd.String("from", "", "Transaction data")
+	to := addBlockCmd.String("to", "", "Transaction data")
+	amount := addBlockCmd.Int("amount", 0, "Transaction data")
 
 	switch os.Args[1] {
 	case "addblock":
@@ -28,11 +30,11 @@ func (cli *CLI) Run() {
 	}
 
 	if addBlockCmd.Parsed() {
-		if *addBlockData == "" {
+		if *from == "" || *to == "" || *amount == 0 {
 			addBlockCmd.Usage()
 			os.Exit(1)
 		}
-		cli.addBlock(*addBlockData)
+		cli.send(*from, *to, *amount)
 	}
 
 	if printChainCmd.Parsed() {
@@ -40,9 +42,18 @@ func (cli *CLI) Run() {
 	}
 }
 
-func (cli *CLI) addBlock(data string) {
-	cli.Bc.AddBlock(data)
-	fmt.Println("Success!")
+func (cli *CLI) send(from, to string, amount int) {
+	fmt.Printf("开始创建区块链...from: %s\tto: %s\tamount: %d\n", from, to, amount)
+	bc := NewBlockchain(from)
+	fmt.Println("链成功创建：", bc)
+	defer bc.Db.Close()
+
+	cli.Bc = bc
+
+	fmt.Println("开始进行交易...")
+	tx := NewUTXOTransaction(from, to, amount, bc)
+	bc.AddBlock([]*Transaction{tx})
+	fmt.Println("add block success!")
 }
 
 func (cli *CLI) printChain() {
@@ -52,7 +63,6 @@ func (cli *CLI) printChain() {
 		block := bci.Next()
 
 		fmt.Printf("Prev. hash: %x\n", block.PrevBlockHash)
-		fmt.Printf("Data: %s\n", block.Data)
 		fmt.Printf("Hash: %x\n", block.Hash)
 		pow := NewProofOfWork(block)
 		fmt.Printf("PoW: %s\n", strconv.FormatBool(pow.Validate()))

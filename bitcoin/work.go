@@ -31,7 +31,7 @@ func (p *ProofOfWork) Run() (int, []byte) {
 	var hash [32]byte
 	nonce := 0
 
-	fmt.Printf("Mining the block containing \"%s\"\n", p.block.Data)
+	fmt.Println("Mining the block containing")
 	maxNonce := math.MaxInt64
 	for nonce < maxNonce {
 		data := p.prepareData(nonce)
@@ -59,11 +59,13 @@ func (p *ProofOfWork) Validate() bool {
 	return hashInt.Cmp(p.target) == -1
 }
 
+// 工作量证明算法必须要将存储在区块里面的交易考虑进去
+// 从而保证区块链交易存储的一致性和可靠性
 func (p *ProofOfWork) prepareData(nonce int) []byte {
 	data := bytes.Join(
 		[][]byte{
 			p.block.PrevBlockHash,
-			p.block.Data,
+			p.block.HashTransactions(),
 			IntToHex(p.block.Timestamp),
 			IntToHex(int64(targetBits)),
 			IntToHex(int64(nonce)),
