@@ -1,0 +1,16 @@
+[global]
+    output = "./docs/output/"
+    tmpl = "./templates/"
+
+[observer]
+    hosts = [
+        "observer-asia.services.mainnet.rchain.coop",
+        "observer-eu.services.mainnet.rchain.coop",
+        "observer-us.services.mainnet.rchain.coop",
+        "observer-exch2.services.mainnet.rchain.coop"
+    ]
+    httpPort = "7070"
+    grpcPort = "40401"
+
+[bitcoin]
+    dbFile = "./bitcoin/db/chain.db"

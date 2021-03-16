@@ -1,0 +1,11 @@
+new rl(`rho:registry:lookup`), RevVaultCh, vaultCh, revVaultKeyCh, deployerId(`rho:rchain:deployerId`), stdout(`rho:io:stdout`), resultCh in {
+  rl!(`rho:rchain:revVault`, *RevVaultCh) |
+  for (@(_, RevVault) <- RevVaultCh) {
+    @RevVault!("findOrCreate", "{{ .FromAddr }}", *vaultCh) |
+    @RevVault!("deployerAuthKey", *deployerId, *revVaultKeyCh) |
+    for (@(true, vault) <- vaultCh; key <- revVaultKeyCh) {
+      @vault!("transfer", "{{ .ToAddr }}", {{ .Amount }}, *key, *resultCh) |
+      for (_ <- resultCh) { Nil }
+    }
+  }
+}
