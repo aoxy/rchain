@@ -2,11 +2,11 @@ package test
 
 import (
 	"context"
-	casper_v1 "dawn1806/rchain/api/pb"
 	"fmt"
 	"google.golang.org/grpc"
 	"io"
 	"log"
+	casper_v1 "rchain/api/pb"
 	"testing"
 )
 

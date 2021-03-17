@@ -1,9 +1,9 @@
 package test
 
 import (
-	"dawn1806/rchain/internal/service"
-	"dawn1806/rchain/internal/utils"
 	"fmt"
+	"rchain/internal/service"
+	"rchain/internal/utils"
 	"reflect"
 	"strings"
 	"testing"
@@ -49,9 +49,9 @@ func TestStructFormat(t *testing.T) {
 				PhloPrice:             10,
 				PhloLimit:             10,
 				ValidAfterBlockNumber: 10,
-				Cost:                  10,
-				Errored:               false,
-				SystemDeployError:     "mark",
+				Cost:              10,
+				Errored:           false,
+				SystemDeployError: "mark",
 			},
 			Success: false,
 			Reason:  "",

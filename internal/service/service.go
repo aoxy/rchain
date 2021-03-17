@@ -1,14 +1,14 @@
 package service
 
 import (
-	casperV1 "dawn1806/rchain/api/pb"
-	"dawn1806/rchain/internal/utils"
 	"encoding/json"
 	"fmt"
 	"github.com/spf13/viper"
 	"io/ioutil"
 	"log"
 	"net/http"
+	casperV1 "rchain/api/pb"
+	"rchain/internal/utils"
 	"strconv"
 	"sync"
 	"time"

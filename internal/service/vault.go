@@ -2,10 +2,10 @@ package service
 
 import (
 	"bytes"
-	casperV1 "dawn1806/rchain/api/pb"
-	"dawn1806/rchain/internal/utils"
 	"fmt"
 	"html/template"
+	casperV1 "rchain/api/pb"
+	"rchain/internal/utils"
 	"time"
 )
 

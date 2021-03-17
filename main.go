@@ -1,8 +1,8 @@
 package main
 
 import (
-	"dawn1806/rchain/bitcoin"
-	"dawn1806/rchain/config"
+	"rchain/bitcoin"
+	"rchain/config"
 )
 
 func main() {

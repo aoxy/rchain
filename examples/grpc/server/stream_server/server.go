@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/dawn1806/rchain_fork/grpc/example/proto"
 	"google.golang.org/grpc"
 	"io"
 	"log"
 	"net"
+	"rchain/examples/grpc/proto"
 )
 
 type StreamService struct{}

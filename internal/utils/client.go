@@ -2,10 +2,10 @@ package utils
 
 import (
 	"context"
-	casperV1 "dawn1806/rchain/api/pb"
 	"google.golang.org/grpc"
 	"io"
 	"log"
+	casperV1 "rchain/api/pb"
 )
 
 func NewDeployServiceClient(target string) (casperV1.DeployServiceClient, *grpc.ClientConn, error) {

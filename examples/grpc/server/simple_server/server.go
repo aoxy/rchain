@@ -2,10 +2,10 @@ package main
 
 import (
 	"context"
-	"github.com/dawn1806/rchain_fork/grpc/example/proto"
 	"google.golang.org/grpc"
 	"log"
 	"net"
+	"rchain/examples/grpc/proto"
 )
 
 type SearchService struct{}

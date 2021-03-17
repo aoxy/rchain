@@ -1,8 +1,8 @@
 package test
 
 import (
-	"dawn1806/rchain/internal/utils"
 	"fmt"
+	"rchain/internal/utils"
 	"strconv"
 	"testing"
 )

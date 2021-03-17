@@ -1,7 +1,7 @@
 package test
 
 import (
-	"dawn1806/rchain/internal/service"
+	"rchain/internal/service"
 	"testing"
 )
 
