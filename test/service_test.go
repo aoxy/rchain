@@ -10,16 +10,16 @@ import (
 	"time"
 )
 
-func TestGetBlocksByHeightClient(t *testing.T) {
-	// numbers: 651551	651552	651684
-	grpcUrl := "observer-asia.services.mainnet.rchain.coop:40401"
-	DSClient, _, _ := utils.NewDeployServiceClient(grpcUrl)
-	// 区间超过100就会直接返回空
-	// 区间100以内，随着区间的大小，请求时间成正比
-	blockInfos, err := utils.GetBlocksByHeightClient(DSClient, 6510, 6515)
-	fmt.Println("err: ", err)
-	fmt.Println("blockInfos: ", blockInfos)
-}
+// func TestGetBlocksByHeightClient(t *testing.T) {
+// 	// numbers: 651551	651552	651684
+// 	grpcUrl := "observer-asia.services.mainnet.rchain.coop:40401"
+// 	DSClient, _, _ := utils.NewDeployServiceClient(grpcUrl)
+// 	// 区间超过100就会直接返回空
+// 	// 区间100以内，随着区间的大小，请求时间成正比
+// 	blockInfos, err := utils.GetBlocksByHeightClient(DSClient, 6510, 6515)
+// 	fmt.Println("err: ", err)
+// 	fmt.Println("blockInfos: ", blockInfos)
+// }
 
 func TestStructFormat(t *testing.T) {
 	for i := 0; i < 1; i++ {
@@ -49,9 +49,9 @@ func TestStructFormat(t *testing.T) {
 				PhloPrice:             10,
 				PhloLimit:             10,
 				ValidAfterBlockNumber: 10,
-				Cost:              10,
-				Errored:           false,
-				SystemDeployError: "mark",
+				Cost:                  10,
+				Errored:               false,
+				SystemDeployError:     "mark",
 			},
 			Success: false,
 			Reason:  "",
@@ -109,9 +109,9 @@ func formatStruct(v reflect.Value, s []string) []string {
 	return s
 }
 
-func TestGetBlockInfos(t *testing.T) {
-	grpcUrl := "observer-asia.services.mainnet.rchain.coop:40401"
-	DSClient, _, _ := utils.NewDeployServiceClient(grpcUrl)
-	blockInfo, _ := utils.LastFinalizedBlock(DSClient)
-	fmt.Println(blockInfo)
-}
+// func TestGetBlockInfos(t *testing.T) {
+// 	grpcUrl := "observer-asia.services.mainnet.rchain.coop:40401"
+// 	DSClient, _, _ := utils.NewDeployServiceClient(grpcUrl)
+// 	blockInfo, _ := utils.LastFinalizedBlock(DSClient)
+// 	fmt.Println(blockInfo)
+// }

@@ -1,10 +1,7 @@
 package test
 
-import (
-	"rchain/internal/service"
-	"testing"
-)
+import ()
 
-func TestVault(t *testing.T) {
-	service.Transfer()
-}
+// func TestVault(t *testing.T) {
+// 	service.Transfer()
+// }

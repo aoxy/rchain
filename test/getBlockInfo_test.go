@@ -7,8 +7,13 @@ import (
 	"io"
 	"log"
 	casper_v1 "rchain/api/pb"
+	"rchain/internal/service"
 	"testing"
 )
+
+func TestPullBlocks(t *testing.T) {
+	service.PullBlocks()
+}
 
 func TestGetBlockInfo(t *testing.T) {
 
