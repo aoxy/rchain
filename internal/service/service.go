@@ -3,11 +3,8 @@ package service
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/spf13/viper"
 	"io/ioutil"
 	"log"
-	"net/http"
-	casperV1 "rchain/api/pb"
 	"rchain/internal/utils"
 	"strconv"
 	"sync"
@@ -17,43 +14,43 @@ import (
 var t *Transaction
 
 func initConfig() {
-	hosts := viper.GetStringSlice("observer.hosts")
-	grpcPort := viper.GetString("observer.grpcPort")
-	httpPort := viper.GetString("observer.httpPort")
-	grpcUrl := hosts[0] + ":" + grpcPort
-	httpUrl := "http://" + hosts[3] + ":" + httpPort + "/getTransaction/"
+	// hosts := viper.GetStringSlice("observer.hosts")
+	// grpcPort := viper.GetString("observer.grpcPort")
+	// httpPort := viper.GetString("observer.httpPort")
+	// grpcUrl := hosts[0] + ":" + grpcPort
+	// httpUrl := "http://" + hosts[3] + ":" + httpPort + "/getTransaction/"
 
-	DSClient, conn, err := utils.NewDeployServiceClient(grpcUrl)
-	if err != nil {
-		fmt.Println("NewDeployServiceClient error ", err)
-		return
-	}
-
-	client := &http.Client{
-		Timeout: time.Second * 30,
-	}
-
-	t = &Transaction{
-		DSClient:       DSClient,
-		httpClient:     client,
-		Conn:           conn,
-		TransactionUrl: httpUrl,
-		BlockInfoCh:    make(chan *casperV1.LightBlockInfo, 1),
-	}
-
-	// 读取最新blockNumber文件[文件来源：获取交易数据后会更新该文件内容]，初始化LastBlockNo
-	// 这个blockNumber是上一次以及处理的最后一个blockNumber
-	// 目的：当发生错误、重启等操作后，为了保证交易信息的连续性
-	data := utils.ReadFile(viper.GetString("global.output") + ".latest_blocknumber")
-	fmt.Println("data: ", data)
-	if data != nil {
-		no, err := strconv.ParseInt(string(data), 10, 64)
-		fmt.Println("data no: ", no)
-		fmt.Println("err: ", err)
-		if err == nil {
-			t.LastBlockNo = no
-		}
-	}
+	// DSClient, conn, err := utils.NewDeployServiceClient(grpcUrl)
+	// if err != nil {
+	// 	fmt.Println("NewDeployServiceClient error ", err)
+	// 	return
+	// }
+	//
+	// client := &http.Client{
+	// 	Timeout: time.Second * 30,
+	// }
+	//
+	// t = &Transaction{
+	// 	DSClient:       DSClient,
+	// 	httpClient:     client,
+	// 	Conn:           conn,
+	// 	TransactionUrl: httpUrl,
+	// 	BlockInfoCh:    make(chan *casperV1.LightBlockInfo, 1),
+	// }
+	//
+	// // 读取最新blockNumber文件[文件来源：获取交易数据后会更新该文件内容]，初始化LastBlockNo
+	// // 这个blockNumber是上一次以及处理的最后一个blockNumber
+	// // 目的：当发生错误、重启等操作后，为了保证交易信息的连续性
+	// data := utils.ReadFile(viper.GetString("global.output") + ".latest_blocknumber")
+	// fmt.Println("data: ", data)
+	// if data != nil {
+	// 	no, err := strconv.ParseInt(string(data), 10, 64)
+	// 	fmt.Println("data no: ", no)
+	// 	fmt.Println("err: ", err)
+	// 	if err == nil {
+	// 		t.LastBlockNo = no
+	// 	}
+	// }
 }
 
 func Run() {
@@ -156,7 +153,8 @@ func GetTransferInfo(wg *sync.WaitGroup) {
 
 	fmt.Println("开始获取交易信息...")
 	// 输出文件目录
-	output := viper.GetString("global.output")
+	// output := viper.GetString("global.output")
+	output := ""
 	for {
 		blockInfo := <-t.BlockInfoCh
 		if blockInfo == nil {

@@ -4,10 +4,10 @@
 package casper_v1
 
 import (
-	_ "dawn1806/rchain/api/pb/scalapb"
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
 	math "math"
+	_ "rchain/api/pb/scalapb"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
