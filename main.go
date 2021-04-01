@@ -8,9 +8,7 @@ import (
 func main() {
 
 	config.LoadConfig()
-
 	// service.Run()
-
 	cli := bitcoin.CLI{}
 	cli.Run()
 }
